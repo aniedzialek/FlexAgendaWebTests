@@ -1,0 +1,10 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="TestAll" verbose="1" >
+    <test name="Regression"   >
+        <packages>
+            <package name="com.selenium.support" />
+            <package name="com.selenium" />
+        </packages>
+    </test>
+</suite>
