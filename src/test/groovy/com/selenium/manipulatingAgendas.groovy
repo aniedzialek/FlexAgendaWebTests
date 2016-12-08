@@ -1,16 +1,14 @@
 package com.selenium
 
+import com.support.driverFactory
 import org.junit.Assert
 import org.openqa.selenium.By
 import org.openqa.selenium.NoSuchElementException
 import org.openqa.selenium.WebDriver
-import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.support.ui.WebDriverWait
 import org.testng.annotations.AfterClass
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
-
-import java.util.concurrent.TimeUnit
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated
 import static org.testng.Assert.fail
@@ -23,16 +21,15 @@ class manipulatingAgendas {
 
     @BeforeClass(alwaysRun = true)
     void setUp() {
-        System.setProperty("webdriver.chrome.driver", "D:\\tools\\SeleniumDrivers\\chromedriver.exe")
-        driver = new ChromeDriver()
+        //TODO: use singleton?
+        driver = driverFactory.getDriver("chrome")
         baseUrl = "http://localhost:4200/"
-        driver.manage().timeouts().implicitlyWait(16, TimeUnit.SECONDS)
     }
 
     @Test
     void displayExistingAgendas() {
         logIn()
-        waitForAgendasPageToLoad()
+
         addNewAgendas(1)        //may not be needed
         //assert at least 1 agenda displayed
     }
@@ -62,6 +59,8 @@ class manipulatingAgendas {
         driver.findElement(By.cssSelector("#md-input-0-input")).sendKeys("anna.bckwabb@gmail.com")
         driver.findElement(By.cssSelector("#md-input-1-input")).sendKeys("T3st3r!")
         driver.findElement(By.cssSelector(".md-primary")).click()
+
+        waitForAgendasPageToLoad()
     }
 
     private void waitForAgendasPageToLoad() {
@@ -97,14 +96,6 @@ v deleteExistingAgendas(1)  //parameter int count
 //moveAgendasAround
 updateAgendasTitle      //?
 updateAgendasStartTime  //?
-
-
-TIME CALCULATIONS/DISPLAY
-setStartTimeToNothing
-setStartTimeToZero
-setStartTimeToLetter
-setStartTimeToSpecialCharacter
-setStartTimeTo2400
 
 
 BASIC

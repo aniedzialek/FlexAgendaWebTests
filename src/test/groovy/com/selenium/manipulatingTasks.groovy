@@ -1,21 +1,18 @@
 package com.selenium
 
+import com.support.driverFactory
 import org.junit.Assert
 import org.openqa.selenium.By
 import org.openqa.selenium.NoSuchElementException
 import org.openqa.selenium.WebDriver
-import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.support.ui.WebDriverWait
 import org.testng.annotations.AfterClass
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
-import java.util.concurrent.TimeUnit
-
 import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated
 import static org.testng.Assert.fail
-
 /**
  * Created by Ania on 2016-12-06.
  */
@@ -27,10 +24,8 @@ class manipulatingTasks {
 
     @BeforeClass(alwaysRun = true)
     void setUp() {
-        System.setProperty("webdriver.chrome.driver", "D:\\tools\\SeleniumDrivers\\chromedriver.exe")
-        driver = new ChromeDriver()
+        driver = driverFactory.getDriver("chrome")
         baseUrl = "http://localhost:4200/"
-        driver.manage().timeouts().implicitlyWait(16, TimeUnit.SECONDS)
     }
 
     @Test

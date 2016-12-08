@@ -6,3 +6,12 @@ package com.selenium
 class timeCalculations {
     //TODO: ImplementMe
 }
+
+/*
+TIME CALCULATIONS/DISPLAY
+setStartTimeToNothing
+setStartTimeToZero
+setStartTimeToLetter
+setStartTimeToSpecialCharacter
+setStartTimeTo2400
+*/
