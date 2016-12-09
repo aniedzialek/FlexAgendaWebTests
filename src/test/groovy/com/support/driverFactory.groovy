@@ -7,28 +7,32 @@ import org.openqa.selenium.safari.SafariDriver
 
 import java.util.concurrent.TimeUnit
 
+import static com.support.Browsers.FIREFOX
+import static com.support.Browsers.IE
+import static com.support.Browsers.SAFARI
+
 /**
  * Created by Ania on 2016-12-06.
  */
-class driverFactory {
-    def static getDriver(String driver) {
-        driver = driver.toLowerCase()
-        def configuredDriver
-        switch (driver) {
-            case "firefox": return new FirefoxDriver()
+class DriverFactory {
+    def static getDriver(browserName) {
+        browserName = browserName.toLowerCase()
+        def driver
+        switch (browserName) {
+            case FIREFOX: return new FirefoxDriver()
                 //TODO: configure me
                 break
-            case "safari": return new SafariDriver()
+            case SAFARI: return new SafariDriver()
                 //TODO: configure me
                 break
-            case "ie": return new InternetExplorerDriver()
+            case IE: return new InternetExplorerDriver()
                 //TODO: configure me
                 break
             default: //TODO: location of the driver (parameter in a config)
                 System.setProperty("webdriver.chrome.driver", "D:\\tools\\SeleniumDrivers\\chromedriver.exe")
-                configuredDriver = new ChromeDriver()
-                configuredDriver.manage().timeouts().implicitlyWait 16, TimeUnit.SECONDS
-                return configuredDriver
+                driver = new ChromeDriver()
+                driver.manage().timeouts().implicitlyWait 16, TimeUnit.SECONDS
+                return driver
                 break
         }
     }

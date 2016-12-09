@@ -1,74 +1,71 @@
 package com.selenium
 
-import com.support.driverFactory
-import org.junit.Assert
+import com.support.Browsers
+import com.support.DriverFactory
 import org.openqa.selenium.By
-import org.openqa.selenium.NoSuchElementException
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.support.ui.WebDriverWait
-import org.testng.annotations.AfterClass
-import org.testng.annotations.BeforeClass
+import org.testng.Assert
+import org.testng.annotations.AfterSuite
+import org.testng.annotations.BeforeSuite
 import org.testng.annotations.Test
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
+import static com.support.Helpers.addNewAgendas
+import static com.support.Helpers.logIn
 import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated
 import static org.testng.Assert.fail
 /**
  * Created by Ania on 2016-12-06.
  */
-class manipulatingTasks {
+class ManipulatingTasks {
     WebDriver driver
-    String baseUrl
-    boolean acceptNextAlert = true
     StringBuffer verificationErrors = new StringBuffer()
 
-    @BeforeClass(alwaysRun = true)
+    @BeforeSuite(alwaysRun = true)
     void setUp() {
-        driver = driverFactory.getDriver("chrome")
-        baseUrl = "http://localhost:4200/"
+        driver = DriverFactory.getDriver(Browsers.CHROME)
+        logIn(driver)
+        addNewAgendas(2, driver)
     }
 
     @Test
     void displayListOfManyTasks() {
-        logIn()
-        waitForAgendasPageToLoad()
-        addTasksToExistingAgenda(100)
+        int taskCount = 10
+        addTasksToExistingAgenda(taskCount)
 
-        ///for howMany
-        Assert.assertNotNull(driver.findElement(By.cssSelector("agendas-list > ul > li")))
+        Assert.assertEquals(taskCount+1 /*+1 for task in second agenda*/, driver.findElements(By.id("taskAddAbove")).size())
+        //TODO: mark one agenda and add+count tasks in that one.
     }
 
     @Test
     void displayAgendaWithTasks() {
-        Assert.assertNotNull(driver.findElement(By.cssSelector("agendas-list > ul > li")))
+        try {
+            driver.findElement(By.id("taskAddAbove"))
+        }
+        catch(e) {
+            println("---------- We have a problem: \n" + e)
+            Assert.fail()
+        }
     }
 
-    @AfterClass(alwaysRun = true)
+    @AfterSuite(alwaysRun = true)
     void tearDown() {
         driver.quit()
-        String verificationErrorString = verificationErrors.toString()
+        String verificationErrorString = verificationErrors.toString()      //TODO: after test or after suite?
         if ("" != verificationErrorString) {
             fail(verificationErrorString)
         }
     }
 
-    private void addTasksToExistingAgenda(int tasksCount) {
-        //for tasksCount
-
-        //name
-        //other
+    private void addTasksToExistingAgenda(tasksCount) {
+        tasksCount.times {
+            driver.findElement(By.id("taskAddAbove")).click()
+        }
     }
 
     private void deleteAllTasks() {
         throw NotImplementedException()
-    }
-
-    private void logIn() {
-        driver.get(baseUrl)
-
-        driver.findElement(By.cssSelector("#md-input-0-input")).sendKeys("anna.bckwabb@gmail.com")
-        driver.findElement(By.cssSelector("#md-input-1-input")).sendKeys("T3st3r!")
-        driver.findElement(By.cssSelector(".md-primary")).click()
     }
 
     private void waitForAgendasPageToLoad() {
@@ -78,24 +75,15 @@ class manipulatingTasks {
         }
         catch(e)
         {
-            println("---------- We have a problem: " + e)
+            println("---------- We have a problem: \n" + e)
             Assert.fail()
-        }
-    }
-
-    private boolean isElementPresent(By by) {
-        try {
-            driver.findElement(by)
-            return true
-        } catch (NoSuchElementException e) {
-            return false
         }
     }
 }
 
 /*
 TASKS
-agendaWithManyTasks(int count)
+v agendaWithManyTasks(int count)
 createTaskWithoutName
 createTaskWithoutDescription
 createTaskWithoutDuration
@@ -111,6 +99,6 @@ updateTasksDuration(Time time)
 updateTasksDescription
 markTaskAsDone
 unmarkTaskAsDone
-addTaskWithTaskPlus
+addTaskWithTaskAbove
 addTaskWithAgendaTaskPlus
 */

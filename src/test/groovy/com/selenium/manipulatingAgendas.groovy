@@ -1,85 +1,124 @@
 package com.selenium
 
-import com.support.driverFactory
-import org.junit.Assert
+import com.support.Browsers
+import com.support.DriverFactory
+import org.apache.commons.lang3.NotImplementedException
 import org.openqa.selenium.By
-import org.openqa.selenium.NoSuchElementException
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.support.ui.WebDriverWait
-import org.testng.annotations.AfterClass
-import org.testng.annotations.BeforeClass
+import org.testng.Assert
+import org.testng.annotations.AfterMethod
+import org.testng.annotations.AfterSuite
+import org.testng.annotations.BeforeSuite
 import org.testng.annotations.Test
 
+import static com.support.Helpers.addNewAgendas
+import static com.support.Helpers.logIn
 import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated
 import static org.testng.Assert.fail
+/**
+ * Created by Ania on 2016-12-06.
+ */
 
-class manipulatingAgendas {
+class ManipulatingAgendas {
     WebDriver driver
-    String baseUrl
-    boolean acceptNextAlert = true
     StringBuffer verificationErrors = new StringBuffer()
 
-    @BeforeClass(alwaysRun = true)
+    @BeforeSuite(alwaysRun = true)
     void setUp() {
-        //TODO: use singleton?
-        driver = driverFactory.getDriver("chrome")
-        baseUrl = "http://localhost:4200/"
+        driver = DriverFactory.getDriver(Browsers.CHROME)
+        logIn(driver)
+    }
+
+    @Test
+    void agendaDisplayedWhenEmpty() {
+        addNewAgendas(1, driver)
+
+        //Assert.   //TODO
+        throw new NotImplementedException()
+    }
+
+    @Test
+    void agendaDisplayedWithTasks() {
+        addNewAgendasWithTasks() //TODO
+
+        throw new NotImplementedException()
     }
 
     @Test
     void displayExistingAgendas() {
-        logIn()
+        addNewAgendas(1, driver)
 
-        addNewAgendas(1)        //may not be needed
-        //assert at least 1 agenda displayed
+        def agendasFound
+        try {
+            agendasFound = driver.findElements(By.id("agenda")).size()
+        }
+        catch(e) {
+            println("---------- We have a problem: " + e)
+            Assert.fail()
+        }
+
+        println("---------- Agendas found: " + agendasFound)
+
+        Assert.assertEquals(1, agendasFound)
     }
 
     @Test
-    // @Parameters("count")      // https://www.tutorialspoint.com/testng/testng_parameterized_test.htm  //count=1
-    void deleteExistingAgendas(int count) {
-        driver.findElement(By.cssSelector(".trash.md-accent")).click()
+    // @Parameters("count")
+    // https://www.tutorialspoint.com/testng/testng_parameterized_test.htm  //count=1
+    void deleteExistingAgenda() {
+        addNewAgendas(1, driver)
+
+        def agendasCountBeforeDelete = driver.findElements(By.id("agenda")).size()
+        println("Agendas found before delete: " + agendasCountBeforeDelete)
+
+        driver.findElement(By.id("agendaDelete")).click()
+        driver.findElement(By.id("confirmDelete")).click()
+        println("Deleted 1 agenda")
+
+        def agendasCountAfterDelete = driver.findElements(By.id("agenda")).size()
+        println("Agendas found after delete: " + agendasCountAfterDelete)
+
+        Assert.assertEquals(agendasCountBeforeDelete-1, agendasCountAfterDelete)
     }
 
-    @AfterClass(alwaysRun = true)
-    void tearDown() {
-        driver.quit()
+    @AfterMethod(alwaysRun = true)
+    void tearDownAfterTest() {
+        removeAllAgendas()
+
         String verificationErrorString = verificationErrors.toString()
         if ("" != verificationErrorString) {
             fail(verificationErrorString)
         }
     }
 
-    private void addNewAgendas(count) {
-        driver.findElement(By.cssSelector(".root > .labels > .md-primary")).click()
+    @AfterSuite(alwaysRun = true)
+    void tearDown() {
+        driver.quit()
     }
 
-    private void logIn() {
-        driver.get(baseUrl)
+    void removeAllAgendas() { //FIXME: can't click the confirm button?
+        def agendasCount = driver.findElements(By.id("agenda")).size()
 
-        driver.findElement(By.cssSelector("#md-input-0-input")).sendKeys("anna.bckwabb@gmail.com")
-        driver.findElement(By.cssSelector("#md-input-1-input")).sendKeys("T3st3r!")
-        driver.findElement(By.cssSelector(".md-primary")).click()
+        agendasCount.times {
+            driver.findElement(By.id("agendaDelete")).click()
 
-        waitForAgendasPageToLoad()
+            waitForDialogButtonClickable()
+            driver.findElement(By.id("confirmDelete")).click()
+        }
+
+        //println("Removed " + agendasCount + " agendas")
     }
 
-    private void waitForAgendasPageToLoad() {
+    void waitForDialogButtonClickable() { //FIXME: clicking the wrong thing; debug with Selenium IDE. CSS selector confirms id
+        //Works sometimes
         try {
             new WebDriverWait(driver, 1)
-                    .until(presenceOfElementLocated(By.cssSelector("agendas-list")))
+                    .until presenceOfElementLocated(By.id("confirmDelete"))
         }
         catch (e) {
             println("---------- We have a problem: " + e)
             Assert.fail()
-        }
-    }
-
-    private boolean isElementPresent(By by) {
-        try {
-            driver.findElement(by)
-            return true
-        } catch (NoSuchElementException e) {
-            return false
         }
     }
 }
@@ -87,7 +126,7 @@ class manipulatingAgendas {
 /*
 AGENDAS
 //agendasListPageDisplayedWhenEmpty
-agendaDisplayedWhenEmpty
+v agendaDisplayedWhenEmpty
 //addManyEmptyAgendas
 /addManyAgendasWithTasks
 
@@ -96,15 +135,4 @@ v deleteExistingAgendas(1)  //parameter int count
 //moveAgendasAround
 updateAgendasTitle      //?
 updateAgendasStartTime  //?
-
-
-BASIC
-logInToFlexAgendaSuccessful
-logOutFromFlexAgendaSuccessful
-changeUserInOneBrowserSession
-autoLogIn	//cookies? FF-yes, Chrome-no
-
-
-
-
  */
