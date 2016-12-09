@@ -28,7 +28,7 @@ class Helpers {
             driver.findElement(By.id("agendaAddNew")).click()
         }
 
-        println("Added " + agendasCount + " agendas")    //TODO: if success, added == agendaCount
+        println("Added " + agendasCount + " agendas")    //TODO: added == agendaCount is success
                                                         //TODO: (can be checked by counting agendas before and after)
     }
 

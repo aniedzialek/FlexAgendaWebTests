@@ -20,13 +20,13 @@ class DriverFactory {
         def driver
         switch (browserName) {
             case FIREFOX: return new FirefoxDriver()
-                //TODO: configure me
+                //TODO: implement me
                 break
             case SAFARI: return new SafariDriver()
-                //TODO: configure me
+                //TODO: implement me
                 break
             case IE: return new InternetExplorerDriver()
-                //TODO: configure me
+                //TODO: implement me
                 break
             default: //TODO: location of the driver (parameter in a config)
                 System.setProperty("webdriver.chrome.driver", "D:\\tools\\SeleniumDrivers\\chromedriver.exe")
