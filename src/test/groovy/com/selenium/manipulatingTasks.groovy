@@ -1,83 +1,86 @@
 package com.selenium
 
-import com.support.Browsers
-import com.support.DriverFactory
+import com.support.Agendas
+import com.support.Helpers
+import com.support.SetUps
 import org.openqa.selenium.By
-import org.openqa.selenium.WebDriver
-import org.openqa.selenium.support.ui.WebDriverWait
 import org.testng.Assert
-import org.testng.annotations.AfterSuite
-import org.testng.annotations.BeforeSuite
 import org.testng.annotations.Test
-import sun.reflect.generics.reflectiveObjects.NotImplementedException
-
-import static com.support.Helpers.addNewAgendas
-import static com.support.Helpers.logIn
-import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated
-import static org.testng.Assert.fail
 /**
  * Created by Ania on 2016-12-06.
  */
-class ManipulatingTasks {
-    WebDriver driver
-    StringBuffer verificationErrors = new StringBuffer()
+class ManipulatingTasks extends SetUps {
+    @Test
+    void addTasksToEmptyAgenda() {
+        Helpers.openPage(Agendas.agendaEmpty, driver)
 
-    @BeforeSuite(alwaysRun = true)
-    void setUp() {
-        driver = DriverFactory.getDriver(Browsers.CHROME)
-        logIn(driver)
-        addNewAgendas(2, driver)
+        def taskCount = findAllTasksInAgenda()
+       // Assert.assertEquals(taskCount, [])
+
+        addTasksToExistingAgenda(1)
+
+        def tasksAfterAddingCount = findAllTasksInAgenda().size()
+
+        //cleanup
+        deleteAllTestTasks()
+
+        Assert.assertEquals(tasksAfterAddingCount, 1 /*+1 for task in second agenda*/)
     }
 
     @Test
-    void displayListOfManyTasks() {
-        int taskCount = 10
-        addTasksToExistingAgenda(taskCount)
+    void displayAgendaWithOneTask() {
+        driver.get(Helpers.BASE_URL + "\\" + Agendas.agendaWithOneTask)
 
-        Assert.assertEquals(taskCount+1 /*+1 for task in second agenda*/, driver.findElements(By.id("taskAddAbove")).size())
-        //TODO: mark one agenda and add+count tasks in that one.
-    }
+        def agendasCount
 
-    @Test
-    void displayAgendaWithTasks() {
         try {
-            driver.findElement(By.id("taskAddAbove"))
+            agendasCount = driver.findElements(By.id("taskAddAbove")).size()
         }
         catch(e) {
             println("---------- We have a problem: \n" + e)
             Assert.fail()
         }
+
+        Assert.assertEquals(agendasCount, 1)
     }
 
-    @AfterSuite(alwaysRun = true)
-    void tearDown() {
-        driver.quit()
-        String verificationErrorString = verificationErrors.toString()      //TODO: after test or after suite?
-        if ("" != verificationErrorString) {
-            fail(verificationErrorString)
-        }
+    @Test
+    void tasksHaveAllData() {
+        def url = Helpers.BASE_URL + "\\" + Agendas.agendaWithManyTasks
+        driver.get(url)
+
+        def tasksFound = findAllTasksInAgenda()
+
+        Assert.assertEquals(tasksFound.size(), 3)
     }
 
-    private void addTasksToExistingAgenda(tasksCount) {
+    def addTasksToExistingAgenda(tasksCount) {
         tasksCount.times {
-            driver.findElement(By.id("taskAddAbove")).click()
+            driver.findElement(By.id("taskAddNewLast")).click()
         }
     }
 
-    private void deleteAllTasks() {
-        throw NotImplementedException()
+    def deleteAllTestTasks() {
+        while(findTask() != []) {
+            findTask().click()
+            Helpers.confirmDelete(driver)
+        }
+
+        Assert.assertEquals(tasks, [])
     }
 
-    private void waitForAgendasPageToLoad() {
-        try{
-            new WebDriverWait(driver, 1)
-                    .until(presenceOfElementLocated(By.cssSelector("agendas-list")))
-        }
-        catch(e)
-        {
-            println("---------- We have a problem: \n" + e)
-            Assert.fail()
-        }
+    def findTask() {
+        return driver.findElement(By.id("taskDelete"))
+    }
+
+//    def findNewTask() {
+//        def task = driver.findElement(By.xpath("//*[@ng-reflect-value='NEWTITLE']/preceding-sibling::*[@id='taskDelete']"))
+//
+//        return task
+//    }
+
+    def findAllTasksInAgenda() {
+        return driver.findElements(By.id("taskAddAbove"))
     }
 }
 

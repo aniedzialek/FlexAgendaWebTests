@@ -7,15 +7,12 @@ import org.openqa.selenium.safari.SafariDriver
 
 import java.util.concurrent.TimeUnit
 
-import static com.support.Browsers.FIREFOX
-import static com.support.Browsers.IE
-import static com.support.Browsers.SAFARI
-
+import static com.support.Browsers.*
 /**
  * Created by Ania on 2016-12-06.
  */
 class DriverFactory {
-    def static getDriver(browserName) {
+    def getDriver(browserName) {
         browserName = browserName.toLowerCase()
         def driver
         switch (browserName) {

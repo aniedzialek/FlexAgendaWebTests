@@ -1,9 +1,11 @@
 package com.selenium
 
+import com.support.SetUps
+
 /**
  * Created by Ania on 2016-12-06.
  */
-class TimeCalculations {
+class TimeCalculations extends SetUps {
     //TODO: ImplementMe
 }
 

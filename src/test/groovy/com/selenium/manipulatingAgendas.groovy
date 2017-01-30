@@ -1,51 +1,38 @@
 package com.selenium
 
-import com.support.Browsers
-import com.support.DriverFactory
+import com.support.SetUps
 import org.apache.commons.lang3.NotImplementedException
 import org.openqa.selenium.By
-import org.openqa.selenium.WebDriver
-import org.openqa.selenium.support.ui.WebDriverWait
 import org.testng.Assert
-import org.testng.annotations.AfterMethod
-import org.testng.annotations.AfterSuite
-import org.testng.annotations.BeforeSuite
 import org.testng.annotations.Test
 
-import static com.support.Helpers.addNewAgendas
-import static com.support.Helpers.logIn
-import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated
-import static org.testng.Assert.fail
+import static com.support.Agendas.agendaEmpty
+import static com.support.Helpers.openPage
+import static com.support.Helpers.waitForDialogButtonClickable
 /**
  * Created by Ania on 2016-12-06.
  */
 
-class ManipulatingAgendas {
-    WebDriver driver
-    StringBuffer verificationErrors = new StringBuffer()
-
-    @BeforeSuite(alwaysRun = true)
-    void setUp() {
-        driver = DriverFactory.getDriver(Browsers.CHROME)
-        logIn(driver)
-    }
-
+class ManipulatingAgendas extends SetUps {
     @Test
     void agendaDisplayedWhenEmpty() {
-        addNewAgendas(1, driver)
+        openPage(agendaEmpty, driver)
+        //Assert empty agenda displayed on the list   //TODO
 
-        //Assert.   //TODO
-        throw new NotImplementedException()
+        //assert one agenda only
+        //assert no tasks
+        Assert.assertNotNull(driver.findElement(By.tagName("agenda")))
+        //TODO
     }
 
-    @Test
+    @Test(enabled=false)
     void agendaDisplayedWithTasks() {
-        addNewAgendasWithTasks() //TODO
+        //Assert agenda with tasks displayed
 
         throw new NotImplementedException()
     }
 
-    @Test
+    @Test(enabled=false)
     void displayExistingAgendas() {
         addNewAgendas(1, driver)
 
@@ -63,7 +50,7 @@ class ManipulatingAgendas {
         Assert.assertEquals(1, agendasFound)
     }
 
-    @Test
+    @Test(enabled=false)
     // @Parameters("count")
     // https://www.tutorialspoint.com/testng/testng_parameterized_test.htm  //count=1
     void deleteExistingAgenda() {
@@ -82,22 +69,7 @@ class ManipulatingAgendas {
         Assert.assertEquals(agendasCountBeforeDelete-1, agendasCountAfterDelete)
     }
 
-    @AfterMethod(alwaysRun = true)
-    void tearDownAfterTest() {
-        removeAllAgendas()
-
-        String verificationErrorString = verificationErrors.toString()
-        if ("" != verificationErrorString) {
-            fail(verificationErrorString)
-        }
-    }
-
-    @AfterSuite(alwaysRun = true)
-    void tearDown() {
-        driver.quit()
-    }
-
-    void removeAllAgendas() { //FIXME: can't click the confirm button?
+    def removeAllAgendas() { //FIXME: can't click the confirm button?
         def agendasCount = driver.findElements(By.id("agenda")).size()
 
         agendasCount.times {
@@ -108,18 +80,6 @@ class ManipulatingAgendas {
         }
 
         //println("Removed " + agendasCount + " agendas")
-    }
-
-    void waitForDialogButtonClickable() { //FIXME: clicking the wrong thing; debug with Selenium IDE. CSS selector confirms id
-        //Works sometimes
-        try {
-            new WebDriverWait(driver, 1)
-                    .until presenceOfElementLocated(By.id("confirmDelete"))
-        }
-        catch (e) {
-            println("---------- We have a problem: " + e)
-            Assert.fail()
-        }
     }
 }
 
